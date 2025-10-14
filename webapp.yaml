@@ -1,0 +1,119 @@
+ru:
+  # General
+  shop_title: "Магазин"
+  admin_panel: "Админ-панель"
+  loading: "Загрузка..."
+  error: "Ошибка"
+  success: "Успешно"
+  cancel: "Отмена"
+  save: "Сохранить"
+  delete: "Удалить"
+  edit: "Редактировать"
+  back: "Назад"
+  
+  # Categories
+  categories: "Категории"
+  all_categories: "Все категории"
+  weapons: "🔫 Оружие"
+  agents: "🧍 Агенты"
+  
+  # Product
+  product: "Товар"
+  products: "Товары"
+  all_products: "📦 Все продукты"
+  create_product: "🛍️ Создать продукт"
+  product_name: "Название товара"
+  product_price: "Цена"
+  product_description: "Описание"
+  product_photo: "Фото (URL)"
+  product_link: "Ссылка на предмет"
+  float_value: "Float (качество)"
+  status: "Статус"
+  available: "В продаже"
+  sold: "Продан"
+  
+  # Auction
+  auction: "Аукцион"
+  auctions: "Аукционы"
+  create_lot: "🧾 Создать лот"
+  starting_price: "Начальная цена"
+  current_price: "Текущая цена"
+  place_bid: "Сделать ставку"
+  
+  # Actions
+  buy: "💰 Купить"
+  copy_link: "📋 Скопировать ссылку"
+  contact_admin: "✉️ Написать админу"
+  link_copied: "Ссылка скопирована!"
+  
+  # Admin
+  admin_actions: "Действия администратора"
+  change_status: "Изменить статус"
+  confirm_delete: "Вы уверены, что хотите удалить?"
+  
+  # Messages
+  no_products: "Товары не найдены"
+  select_category: "Выберите категорию"
+  fill_all_fields: "Заполните все поля"
+  product_created: "Товар создан успешно"
+  lot_created: "Лот создан успешно"
+
+uz:
+  # General
+  shop_title: "Do'kon"
+  admin_panel: "Admin panel"
+  loading: "Yuklanmoqda..."
+  error: "Xato"
+  success: "Muvaffaqiyatli"
+  cancel: "Bekor qilish"
+  save: "Saqlash"
+  delete: "O'chirish"
+  edit: "Tahrirlash"
+  back: "Orqaga"
+  
+  # Categories
+  categories: "Kategoriyalar"
+  all_categories: "Barcha kategoriyalar"
+  weapons: "🔫 Qurollar"
+  agents: "🧍 Agentlar"
+  
+  # Product
+  product: "Mahsulot"
+  products: "Mahsulotlar"
+  all_products: "📦 Barcha mahsulotlar"
+  create_product: "🛍️ Mahsulot yaratish"
+  product_name: "Mahsulot nomi"
+  product_price: "Narxi"
+  product_description: "Tavsif"
+  product_photo: "Rasm (URL)"
+  product_link: "Mahsulot havolasi"
+  float_value: "Float (sifat)"
+  status: "Holat"
+  available: "Sotuvda"
+  sold: "Sotilgan"
+  
+  # Auction
+  auction: "Auktsion"
+  auctions: "Auktsionlar"
+  create_lot: "🧾 Lot yaratish"
+  starting_price: "Boshlang'ich narx"
+  current_price: "Joriy narx"
+  place_bid: "Taklif qilish"
+  
+  # Actions
+  buy: "💰 Sotib olish"
+  copy_link: "📋 Havolani nusxalash"
+  contact_admin: "✉️ Adminga yozish"
+  link_copied: "Havola nusxalandi!"
+  
+  # Admin
+  admin_actions: "Administrator harakatlari"
+  change_status: "Holatni o'zgartirish"
+  confirm_delete: "O'chirishni xohlaysizmi?"
+  
+  # Messages
+  no_products: "Mahsulotlar topilmadi"
+  select_category: "Kategoriyani tanlang"
+  fill_all_fields: "Barcha maydonlarni to'ldiring"
+  product_created: "Mahsulot muvaffaqiyatli yaratildi"
+  lot_created: "Lot muvaffaqiyatli yaratildi"

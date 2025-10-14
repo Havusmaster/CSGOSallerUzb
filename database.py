@@ -1,218 +1,166 @@
-"""
-SQLite: хранение пользователей, товаров, аукционов и ставок.
-Автоинициализация базы при импорте.
-"""
-
-import sqlite3
-import time
-from contextlib import closing
-from config import DB_PATH, DEFAULT_LANG, DEFAULT_THEME
+from datetime import datetime
+from typing import Dict, List, Optional
+import uuid
 
 
-def get_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def init_db():
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-
-        # === USERS ===
-        # Нельзя использовать ? в DEFAULT, поэтому вставляем напрямую через f-string
-        cur.execute(f"""
-        CREATE TABLE IF NOT EXISTS users (
-            tg_id INTEGER PRIMARY KEY,
-            lang TEXT DEFAULT '{DEFAULT_LANG}',
-            theme TEXT DEFAULT '{DEFAULT_THEME}',
-            updated_at INTEGER
-        )
-        """)
-
-        # === PRODUCTS ===
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            description TEXT,
-            price REAL NOT NULL,
-            type TEXT NOT NULL,
-            float_value REAL,
-            link TEXT,
-            sold INTEGER DEFAULT 0,
-            created_at INTEGER
-        )
-        """)
-
-        # === AUCTIONS ===
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS auctions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT,
-            start_price REAL NOT NULL,
-            step REAL NOT NULL,
-            end_timestamp INTEGER NOT NULL,
-            finished INTEGER DEFAULT 0,
-            created_at INTEGER
-        )
-        """)
-
-        # === BIDS ===
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS bids (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            auction_id INTEGER NOT NULL,
-            bidder_identifier TEXT NOT NULL,
-            amount REAL NOT NULL,
-            created_at INTEGER,
-            FOREIGN KEY(auction_id) REFERENCES auctions(id)
-        )
-        """)
-
-        conn.commit()
-
-
-# --- Пользователи ---
-def set_user_pref(tg_id: int, lang: str = None, theme: str = None):
-    ts = int(time.time())
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,))
-        if cur.fetchone():
-            if lang:
-                cur.execute("UPDATE users SET lang=?, updated_at=? WHERE tg_id=?", (lang, ts, tg_id))
-            if theme:
-                cur.execute("UPDATE users SET theme=?, updated_at=? WHERE tg_id=?", (theme, ts, tg_id))
-        else:
-            cur.execute(
-                "INSERT INTO users (tg_id, lang, theme, updated_at) VALUES (?, ?, ?, ?)",
-                (tg_id, lang or DEFAULT_LANG, theme or DEFAULT_THEME, ts)
-            )
-        conn.commit()
-
-
-def get_user_pref(tg_id: int):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,))
-        row = cur.fetchone()
-        if not row:
-            return {"tg_id": tg_id, "lang": DEFAULT_LANG, "theme": DEFAULT_THEME}
-        return dict(row)
-
-
-# --- Товары ---
-def add_product(name, description, price, type_, float_value=None, link=None):
-    ts = int(time.time())
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("""
-        INSERT INTO products (name, description, price, type, float_value, link, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (name, description, price, type_, float_value, link, ts))
-        conn.commit()
-        return cur.lastrowid
-
-
-def get_products(only_available=True):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        if only_available:
-            cur.execute("SELECT * FROM products WHERE sold=0 ORDER BY id DESC")
-        else:
-            cur.execute("SELECT * FROM products ORDER BY id DESC")
-        return [dict(r) for r in cur.fetchall()]
-
-
-def get_product(product_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM products WHERE id=?", (product_id,))
-        row = cur.fetchone()
-        return dict(row) if row else None
-
-
-def mark_product_sold(product_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("UPDATE products SET sold=1 WHERE id=?", (product_id,))
-        conn.commit()
-
-
-def delete_product(product_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("DELETE FROM products WHERE id=?", (product_id,))
-        conn.commit()
-
-
-# --- Аукционы и ставки ---
-def create_auction(title, description, start_price, step, end_timestamp):
-    ts = int(time.time())
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("""
-        INSERT INTO auctions (title, description, start_price, step, end_timestamp, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """, (title, description, start_price, step, end_timestamp, ts))
-        conn.commit()
-        return cur.lastrowid
-
-
-def get_auctions(only_active=True):
-    now = int(time.time())
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        if only_active:
-            cur.execute("SELECT * FROM auctions WHERE finished=0 AND end_timestamp>? ORDER BY end_timestamp ASC", (now,))
-        else:
-            cur.execute("SELECT * FROM auctions ORDER BY id DESC")
-        return [dict(r) for r in cur.fetchall()]
-
-
-def get_auction(auction_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM auctions WHERE id=?", (auction_id,))
-        row = cur.fetchone()
-        return dict(row) if row else None
-
-
-def finish_auction(auction_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("UPDATE auctions SET finished=1 WHERE id=?", (auction_id,))
-        conn.commit()
-
-
-def place_bid(auction_id, bidder_identifier, amount):
-    ts = int(time.time())
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("""
-        INSERT INTO bids (auction_id, bidder_identifier, amount, created_at)
-        VALUES (?, ?, ?, ?)
-        """, (auction_id, bidder_identifier, amount, ts))
-        conn.commit()
-        return cur.lastrowid
-
-
-def get_bids_for_auction(auction_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM bids WHERE auction_id=? ORDER BY amount DESC, created_at ASC", (auction_id,))
-        return [dict(r) for r in cur.fetchall()]
-
-
-def get_highest_bid(auction_id):
-    with closing(get_conn()) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM bids WHERE auction_id=? ORDER BY amount DESC, created_at ASC LIMIT 1", (auction_id,))
-        row = cur.fetchone()
-        return dict(row) if row else None
-
-
-# Автоматическая инициализация базы данных при импорте
-init_db()
+class Database:
+    """In-memory database for products and auctions"""
+    
+    def __init__(self):
+        self.products: Dict[str, dict] = {}
+        self.auctions: Dict[str, dict] = {}
+        self.purchases: Dict[str, dict] = {}
+    
+    # Product methods
+    def add_product(self, name: str, price: float, category: str, 
+                   description: str, photo_url: str, link: str, 
+                   float_value: Optional[float] = None) -> str:
+        """Add a new product"""
+        product_id = str(uuid.uuid4())
+        self.products[product_id] = {
+            "id": product_id,
+            "name": name,
+            "price": price,
+            "category": category,
+            "description": description,
+            "photo_url": photo_url,
+            "link": link,
+            "float": float_value,
+            "status": "available",  # available, sold
+            "created_at": datetime.now().isoformat()
+        }
+        return product_id
+    
+    def get_product(self, product_id: str) -> Optional[dict]:
+        """Get product by ID"""
+        return self.products.get(product_id)
+    
+    def get_all_products(self, category: Optional[str] = None, 
+                        status: Optional[str] = None) -> List[dict]:
+        """Get all products with optional filters"""
+        products = list(self.products.values())
+        
+        if category:
+            products = [p for p in products if p["category"] == category]
+        
+        if status:
+            products = [p for p in products if p["status"] == status]
+        
+        return sorted(products, key=lambda x: x["created_at"], reverse=True)
+    
+    def update_product(self, product_id: str, **kwargs) -> bool:
+        """Update product fields"""
+        if product_id not in self.products:
+            return False
+        
+        self.products[product_id].update(kwargs)
+        return True
+    
+    def delete_product(self, product_id: str) -> bool:
+        """Delete a product"""
+        if product_id in self.products:
+            del self.products[product_id]
+            return True
+        return False
+    
+    def set_product_status(self, product_id: str, status: str) -> bool:
+        """Set product status (available/sold)"""
+        return self.update_product(product_id, status=status)
+    
+    # Auction methods
+    def add_auction(self, name: str, starting_price: float, category: str,
+                   description: str, photo_url: str, link: str,
+                   float_value: Optional[float] = None) -> str:
+        """Add a new auction lot"""
+        auction_id = str(uuid.uuid4())
+        self.auctions[auction_id] = {
+            "id": auction_id,
+            "name": name,
+            "starting_price": starting_price,
+            "current_price": starting_price,
+            "category": category,
+            "description": description,
+            "photo_url": photo_url,
+            "link": link,
+            "float": float_value,
+            "status": "active",  # active, closed
+            "bids": [],
+            "created_at": datetime.now().isoformat()
+        }
+        return auction_id
+    
+    def get_auction(self, auction_id: str) -> Optional[dict]:
+        """Get auction by ID"""
+        return self.auctions.get(auction_id)
+    
+    def get_all_auctions(self, status: Optional[str] = None) -> List[dict]:
+        """Get all auctions with optional status filter"""
+        auctions = list(self.auctions.values())
+        
+        if status:
+            auctions = [a for a in auctions if a["status"] == status]
+        
+        return sorted(auctions, key=lambda x: x["created_at"], reverse=True)
+    
+    def add_bid(self, auction_id: str, user_id: int, amount: float) -> bool:
+        """Add a bid to an auction"""
+        if auction_id not in self.auctions:
+            return False
+        
+        auction = self.auctions[auction_id]
+        if auction["status"] != "active":
+            return False
+        
+        if amount <= auction["current_price"]:
+            return False
+        
+        auction["bids"].append({
+            "user_id": user_id,
+            "amount": amount,
+            "timestamp": datetime.now().isoformat()
+        })
+        auction["current_price"] = amount
+        return True
+    
+    def close_auction(self, auction_id: str) -> bool:
+        """Close an auction"""
+        return self.update_auction(auction_id, status="closed")
+    
+    def update_auction(self, auction_id: str, **kwargs) -> bool:
+        """Update auction fields"""
+        if auction_id not in self.auctions:
+            return False
+        
+        self.auctions[auction_id].update(kwargs)
+        return True
+    
+    def delete_auction(self, auction_id: str) -> bool:
+        """Delete an auction"""
+        if auction_id in self.auctions:
+            del self.auctions[auction_id]
+            return True
+        return False
+    
+    # Purchase tracking
+    def record_purchase(self, product_id: str, user_id: int) -> str:
+        """Record a purchase attempt"""
+        purchase_id = str(uuid.uuid4())
+        self.purchases[purchase_id] = {
+            "id": purchase_id,
+            "product_id": product_id,
+            "user_id": user_id,
+            "status": "pending",  # pending, confirmed, cancelled
+            "timestamp": datetime.now().isoformat()
+        }
+        return purchase_id
+    
+    def get_purchase(self, purchase_id: str) -> Optional[dict]:
+        """Get purchase by ID"""
+        return self.purchases.get(purchase_id)
+    
+    def update_purchase_status(self, purchase_id: str, status: str) -> bool:
+        """Update purchase status"""
+        if purchase_id in self.purchases:
+            self.purchases[purchase_id]["status"] = status
+            return True
+        return False
