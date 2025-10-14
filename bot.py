@@ -10,7 +10,7 @@ from database import Database
 # Configuration
 BOT_TOKEN = "7504123410:AAEznGqRafbyrBx2e34HzsxztWV201HRMxE"
 ADMIN_IDS = [1939282952, 5266027747]
-WEBAPP_URL = "https://your-replit-url.repl.co/webapp.html"  # Replace with your actual URL
+WEBAPP_URL = "https://csgosalleruzb.onrender.com"  # Replace with your actual URL
 
 # Initialize
 logging.basicConfig(level=logging.INFO)
