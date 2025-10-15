@@ -14,9 +14,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Инициализация бота
-BOT_TOKEN = os.getenv("BOT_TOKEN", "7881818181:AAGxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-ADMIN_IDS = [int(id.strip()) for id in os.getenv("ADMIN_IDS", "123456789").split(",")]
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-static-site.onrender.com")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "7504123410:AAEznGqRafbyrBx2e34HzsxztWV201HRMxE")
+ADMIN_IDS = [int(id.strip()) for id in os.getenv("ADMIN_IDS", "5266027747").split(",")]
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://csgosalleruzb-1.onrender.com")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()

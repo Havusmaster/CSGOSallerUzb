@@ -12,7 +12,7 @@ from database import Database
 
 # Configuration
 BOT_TOKEN = "7504123410:AAEznGqRafbyrBx2e34HzsxztWV201HRMxE"
-ADMIN_IDS = [1939282952, 5266027747]
+ADMIN_IDS = [5266027747]
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://csgosalleruzb-1.onrender.com")  # Set in Render env vars
 
 WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
