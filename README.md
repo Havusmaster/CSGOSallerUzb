@@ -14,19 +14,19 @@ Telegram бот с веб-интерфейсом магазина для про�
 ## Структура проекта
 
 \`\`\`
-telegram-shop-bot/\
-├── static-site/           # Веб-интерфейс (Static Site)\
-│   ├── index.html        # Главная страница\
-│   ├── app.js            # Логика приложения\
-│   ├── translations.js   # Переводы\
-│   └── translations.yaml # YAML переводы\
-├── bot.py                # Telegram бот\
-├── database.py           # База данных (in-memory)\
-├── shop.py               # Логика магазина\
-├── admin_panel.py        # Админ-панель\
-├── requirements.txt      # Python зависимости\
-├── DEPLOYMENT.md         # Инструкция по развертыванию\
-└── README.md             # Этот файл\
+telegram-shop-bot/
+├── static-site/           # Веб-интерфейс (Static Site)
+│   ├── index.html        # Главная страница
+│   ├── app.js            # Логика приложения
+│   ├── translations.js   # Переводы
+│   └── translations.yaml # YAML переводы
+├── bot.py                # Telegram бот
+├── database.py           # База данных (in-memory)
+├── shop.py               # Логика магазина
+├── admin_panel.py        # Админ-панель
+├── requirements.txt      # Python зависимости
+├── DEPLOYMENT.md         # Инструкция по развертыванию
+└── README.md             # Этот файл
 \`\`\`
 
 ## Быстрый старт
