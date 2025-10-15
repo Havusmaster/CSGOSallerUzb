@@ -13,10 +13,10 @@ from database import Database
 # Configuration
 BOT_TOKEN = "7504123410:AAEznGqRafbyrBx2e34HzsxztWV201HRMxE"
 ADMIN_IDS = [1939282952, 5266027747]
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-static-site.onrender.com")  # Set in Render env vars
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://csgosalleruzb-1.onrender.com")  # Set in Render env vars
 
 WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
-WEBHOOK_HOST = os.getenv("RENDER_EXTERNAL_URL", "https://your-app.onrender.com")  # Set in Render
+WEBHOOK_HOST = os.getenv("RENDER_EXTERNAL_URL", "https://csgosalleruzb-1.onrender.com")  # Set in Render
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 WEB_SERVER_HOST = "0.0.0.0"
 WEB_SERVER_PORT = int(os.getenv("PORT", 8080))  # Render provides PORT env variable
