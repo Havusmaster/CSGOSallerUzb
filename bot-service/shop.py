@@ -48,7 +48,7 @@ async def handle_purchase_request(message: types.Message, bot: Bot):
                     await message.answer(
                         f"✅ Вы участвуете в аукционе!\n\n"
                         f"📦 Лот: {auction['name']}\n"
-                        f"💰 Текущая ставка: ${auction['current_price']}\n\n"
+                        f"💰 Текущ��я ставка: ${auction['current_price']}\n\n"
                         f"Следите за обновлениями!"
                     )
                 else:
