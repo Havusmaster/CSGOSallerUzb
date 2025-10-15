@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop WebApp</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #2a2a2a;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .categories {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .category-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-category {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .product-float {
+            font-size: 14px;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .product-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .status-available {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-sold {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .admin-btn {
+            padding: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .admin-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="pageTitle">Магазин</h1>
+            <div class="lang-switch">
+                <button class="lang-btn active" data-lang="ru">RU</button>
+                <button class="lang-btn" data-lang="uz">UZ</button>
+            </div>
+        </div>
+
+         Shop View 
+        <div id="shopView">
+            <div class="categories" id="categories"></div>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+
+         Admin Panel 
+        <div id="adminPanel" class="admin-panel">
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="openCreateLotModal()">
+                    <span id="createLotBtn">🧾 Создать лот</span>
+                </button>
+                <button class="admin-btn" onclick="openCreateProductModal()">
+                    <span id="createProductBtn">🛍️ Создать продукт</span>
+                </button>
+                <button class="admin-btn" onclick="showAllProducts()">
+                    <span id="allProductsBtn">📦 Все продукты</span>
+                </button>
+            </div>
+            <div class="products-grid" id="adminProductsGrid"></div>
+        </div>
+    </div>
+
+     Create Product Modal 
+    <div id="createProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="createProductTitle">Создать продукт</h2>
+                <button class="close-btn" onclick="closeModal('createProductModal')">&times;</button>
+            </div>
+            <form id="createProductForm">
+                <div class="form-group">
+                    <label class="form-label" id="labelProductName">Название товара</label>
+                    <input type="text" class="form-input" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelProductPrice">Цена</label>
+                    <input type="number" class="form-input" id="productPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelCategory">Категория</label>
+                    <select class="form-select" id="productCategory" required>
+                        <option value="weapons">🔫 Оружие</option>
+                        <option value="agents">🧍 Агенты</option>
+                    </select>
+                </div>
+                <div class="form-group" id="floatGroup">
+                    <label class="form-label" id="labelFloat">Float (качество)</label>
+                    <input type="number" class="form-input" id="productFloat" step="0.0001" min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelDescription">Описание</label>
+                    <textarea class="form-textarea" id="productDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelPhoto">Фото (URL)</label>
+                    <input type="url" class="form-input" id="productPhoto" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelLink">Ссылка на предмет</label>
+                    <input type="url" class="form-input" id="productLink" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="saveProductBtn">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+     Create Lot Modal 
+    <div id="createLotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="createLotTitle">Создать лот</h2>
+                <button class="close-btn" onclick="closeModal('createLotModal')">&times;</button>
+            </div>
+            <form id="createLotForm">
+                <div class="form-group">
+                    <label class="form-label" id="labelLotName">Название</label>
+                    <input type="text" class="form-input" id="lotName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelStartingPrice">Начальная цена</label>
+                    <input type="number" class="form-input" id="lotPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelLotCategory">Категория</label>
+                    <select class="form-select" id="lotCategory" required>
+                        <option value="weapons">🔫 Оружие</option>
+                        <option value="agents">🧍 Агенты</option>
+                    </select>
+                </div>
+                <div class="form-group" id="lotFloatGroup">
+                    <label class="form-label" id="labelLotFloat">Float (качество)</label>
+                    <input type="number" class="form-input" id="lotFloat" step="0.0001" min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelLotDescription">Описание</label>
+                    <textarea class="form-textarea" id="lotDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelLotPhoto">Фото (URL)</label>
+                    <input type="url" class="form-input" id="lotPhoto" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="labelLotLink">Ссылка</label>
+                    <input type="url" class="form-input" id="lotLink" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="saveLotBtn">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
