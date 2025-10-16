@@ -181,16 +181,57 @@ document.getElementById("lotCategory")?.addEventListener("change", (e) => {
   floatGroup.style.display = e.target.value === "weapons" ? "block" : "none"
 })
 
+// Helper: Generate photo URL based on product name and category
+function generatePhotoUrl(name, category) {
+  // Создаем уникальный цвет на основе названия
+  const colors = [
+    ['667eea', '764ba2'], // Фиолетовый
+    ['f093fb', 'f5576c'], // Розовый
+    ['4facfe', '00f2fe'], // Голубой
+    ['43e97b', '38f9d7'], // Зеленый
+    ['fa709a', 'fee140'], // Желто-розовый
+    ['30cfd0', '330867'], // Сине-фиолетовый
+    ['a8edea', 'fed6e3'], // Пастельный
+    ['ff9a9e', 'fecfef'], // Светло-розовый
+  ]
+  
+  const colorIndex = name.length % colors.length
+  const [color1, color2] = colors[colorIndex]
+  
+  // Иконка в зависимости от категории
+  const icon = category === 'weapons' ? '🔫' : '👤'
+  
+  // Кодируем текст для URL
+  const encodedName = encodeURIComponent(name.substring(0, 20))
+  
+  return `https://via.placeholder.com/400x200/${color1}/${color2}?text=${icon}+${encodedName}`
+}
+
+// Helper: Generate Steam market link
+function generateProductLink(name, category) {
+  // Создаем ссылку на Steam Market
+  const encodedName = encodeURIComponent(name)
+  return `https://steamcommunity.com/market/search?q=${encodedName}`
+}
+
 // Create product form
 document.getElementById("createProductForm")?.addEventListener("submit", (e) => {
   e.preventDefault()
+  
+  const name = document.getElementById("productName").value
+  const category = document.getElementById("productCategory").value
+  const photoInput = document.getElementById("productPhoto").value
+  const linkInput = document.getElementById("productLink").value
+  
   const formData = {
-    name: document.getElementById("productName").value,
+    name: name,
     price: Number.parseFloat(document.getElementById("productPrice").value),
-    category: document.getElementById("productCategory").value,
+    category: category,
     description: document.getElementById("productDescription").value,
-    photo_url: document.getElementById("productPhoto").value,
-    link: document.getElementById("productLink").value,
+    // Автогенерация фото, если не указано
+    photo_url: photoInput || generatePhotoUrl(name, category),
+    // Автогенерация ссылки, если не указана
+    link: linkInput || generateProductLink(name, category),
     float: document.getElementById("productFloat").value || null,
     status: "available",
     id: Date.now().toString(),
@@ -201,14 +242,42 @@ document.getElementById("createProductForm")?.addEventListener("submit", (e) => 
   closeModal("createProductModal")
   renderProducts()
   e.target.reset()
+  
+  // Показываем уведомление
+  tg.showAlert(`✅ Товар "${name}" создан!`)
 })
 
 // Create lot form
 document.getElementById("createLotForm")?.addEventListener("submit", (e) => {
   e.preventDefault()
+  
+  const name = document.getElementById("lotName").value
+  const category = document.getElementById("lotCategory").value
+  const photoInput = document.getElementById("lotPhoto").value
+  const linkInput = document.getElementById("lotLink").value
+  
+  const lotData = {
+    name: name,
+    price: Number.parseFloat(document.getElementById("lotPrice").value),
+    category: category,
+    description: document.getElementById("lotDescription").value,
+    // Автогенерация фото, если не указано
+    photo_url: photoInput || generatePhotoUrl(name, category),
+    // Автогенерация ссылки, если не указана
+    link: linkInput || generateProductLink(name, category),
+    float: document.getElementById("lotFloat").value || null,
+    status: "available",
+    type: "auction",
+    id: Date.now().toString(),
+  }
+  
+  products.push(lotData)
   tg.sendData("admin:auction_created")
   closeModal("createLotModal")
   e.target.reset()
+  
+  // Показываем уведомление
+  tg.showAlert(`✅ Лот "${name}" создан!`)
 })
 
 // Show all products (admin)

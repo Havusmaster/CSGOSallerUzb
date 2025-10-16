@@ -576,12 +576,18 @@
                     <textarea class="form-textarea" id="productDescription" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" id="labelPhoto">Фото (URL)</label>
-                    <input type="url" class="form-input" id="productPhoto" required>
+                    <label class="form-label" id="labelPhoto">Фото (URL) - необязательно</label>
+                    <input type="url" class="form-input" id="productPhoto" placeholder="Оставьте пустым для автогенерации">
+                    <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                        💡 Если не указать, фото создастся автоматически
+                    </small>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" id="labelLink">Ссылка на предмет</label>
-                    <input type="url" class="form-input" id="productLink" required>
+                    <label class="form-label" id="labelLink">Ссылка на предмет - необязательно</label>
+                    <input type="url" class="form-input" id="productLink" placeholder="Оставьте пустым для автогенерации">
+                    <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                        💡 Если не указать, создастся ссылка на Steam Market
+                    </small>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;" id="saveProductBtn">Сохранить</button>
             </form>
@@ -620,12 +626,18 @@
                     <textarea class="form-textarea" id="lotDescription" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" id="labelLotPhoto">Фото (URL)</label>
-                    <input type="url" class="form-input" id="lotPhoto" required>
+                    <label class="form-label" id="labelLotPhoto">Фото (URL) - необязательно</label>
+                    <input type="url" class="form-input" id="lotPhoto" placeholder="Оставьте пустым для автогенерации">
+                    <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                        💡 Если не указать, фото создастся автоматически
+                    </small>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" id="labelLotLink">Ссылка</label>
-                    <input type="url" class="form-input" id="lotLink" required>
+                    <label class="form-label" id="labelLotLink">Ссылка - необязательно</label>
+                    <input type="url" class="form-input" id="lotLink" placeholder="Оставьте пустым для автогенерации">
+                    <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                        💡 Если не указать, создастся ссылка на Steam Market
+                    </small>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;" id="saveLotBtn">Сохранить</button>
             </form>
