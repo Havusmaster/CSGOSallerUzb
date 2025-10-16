@@ -1,0 +1,22 @@
+services:
+  # Web Service - Бот с веб-сервером
+  - type: web
+    name: csgosalleruzb
+    env: python
+    region: frankfurt  # Ближайший регион
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false  # Установите вручную в Render Dashboard
+      - key: ADMIN_IDS
+        value: "1939282952,5266027747"
+      - key: WEBAPP_URL
+        value: https://csgosalleruzb-1.onrender.com
+      - key: RENDER_EXTERNAL_URL
+        value: https://csgosalleruzb-1.onrender.com
+      - key: PORT
+        value: "8080"
+    healthCheckPath: /health
+    autoDeploy: true

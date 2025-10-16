@@ -8,7 +8,7 @@ import os
 from database import db
 
 admin_router = Router()
-ADMIN_IDS = [int(id.strip()) for id in os.getenv("ADMIN_IDS", "123456789").split(",")]
+ADMIN_IDS = [int(id.strip()) for id in os.getenv("ADMIN_IDS", "1939282952,5266027747").split(",")]
 
 class ProductForm(StatesGroup):
     category = State()
