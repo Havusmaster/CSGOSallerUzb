@@ -8,31 +8,7 @@ let currentLang = "ru"
 let products = []
 let currentCategory = "all"
 let isAdmin = false
-const translationsData = {
-  ru: {
-    admin_panel: "Админ панель",
-    shop_title: "Магазин",
-    create_lot: "Создать лот",
-    create_product: "Создать продукт",
-    all_products: "Все продукты",
-    all_categories: "Все категории",
-    weapons: "Оружие",
-    agents: "Агенты",
-    float_value: "Float значение",
-    product_description: "Описание продукта",
-    product_photo: "Фото продукта",
-    product_link: "Ссылка на продукт",
-    save: "Сохранить",
-    buy: "Купить",
-    copy_link: "Скопировать ссылку",
-    contact_admin: "Связаться с админом",
-    link_copied: "Ссылка скопирована",
-    no_products: "Нет продуктов",
-    change_status: "Изменить статус",
-    delete: "Удалить",
-    confirm_delete: "Вы уверены, что хотите удалить продукт?",
-  },
-}
+// translationsData загружается из translations.js
 
 // Check if admin mode
 const urlParams = new URLSearchParams(window.location.search)

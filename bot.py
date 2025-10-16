@@ -98,6 +98,39 @@ async def health_check(request):
     return web.Response(text="OK")
 
 
+async def serve_webapp(request):
+    """Serve the main webapp HTML"""
+    try:
+        with open('static-site/index.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        return web.Response(text=html_content, content_type='text/html')
+    except FileNotFoundError:
+        return web.Response(text="WebApp not found", status=404)
+
+
+async def serve_static(request):
+    """Serve static files (JS, CSS, images)"""
+    filename = request.match_info['filename']
+    try:
+        # Определяем тип контента
+        if filename.endswith('.js'):
+            content_type = 'application/javascript'
+        elif filename.endswith('.css'):
+            content_type = 'text/css'
+        elif filename.endswith('.png'):
+            content_type = 'image/png'
+        elif filename.endswith('.jpg') or filename.endswith('.jpeg'):
+            content_type = 'image/jpeg'
+        else:
+            content_type = 'text/plain'
+        
+        with open(f'static-site/{filename}', 'r', encoding='utf-8') as f:
+            content = f.read()
+        return web.Response(text=content, content_type=content_type)
+    except FileNotFoundError:
+        return web.Response(text="File not found", status=404)
+
+
 async def on_startup(app):
     """Set webhook on startup"""
     await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
@@ -127,9 +160,10 @@ def main():
     )
     webhook_requests_handler.register(app, path=WEBHOOK_PATH)
     
-    # Add health check route
-    app.router.add_get("/", health_check)
-    app.router.add_get("/health", health_check)
+    # Add routes
+    app.router.add_get("/", serve_webapp)  # Главная страница - магазин
+    app.router.add_get("/health", health_check)  # Health check для Render
+    app.router.add_get("/static/{filename}", serve_static)  # Статические файлы
     
     # Setup startup and shutdown hooks
     app.on_startup.append(on_startup)
